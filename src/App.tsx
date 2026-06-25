@@ -9,6 +9,7 @@ import { CacheProvider } from "@emotion/react";
 
 import NavDrawer, { SectionId } from "./components/layout/NavDrawer";
 import BadmintonPage from "./components/pages/Badminton";
+import BadmintonStatsPage from "./components/pages/BadmintonStats";
 import VersusPage from "./components/pages/Versus";
 import WheelPage from "./components/pages/Wheel";
 import createAppTheme from "./theme";
@@ -32,6 +33,7 @@ const App = () => {
         {section === "wheel" && <WheelPage onOpenNav={openNav} />}
         {section === "versus" && <VersusPage onOpenNav={openNav} />}
         {section === "badminton" && <BadmintonPage onOpenNav={openNav} />}
+        {section === "badmintonStats" && <BadmintonStatsPage onOpenNav={openNav} />}
 
         <NavDrawer open={navOpen} onClose={() => setNavOpen(false)} active={section} onSelect={setSection} />
       </ThemeProvider>

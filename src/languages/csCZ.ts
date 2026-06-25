@@ -51,6 +51,14 @@ const csCZ = {
   noMatches: "Zatím žádný zápas – přidej ho tlačítkem „Nový zápas\"",
   removeMatch: "Smazat zápas",
   noSets: "Zatím žádný set",
+  sectionStats: "Statistiky",
+  statsEmpty: "Zatím nejsou žádné zápasy s výsledky",
+  colPlayer: "Hráč",
+  colWins: "Výhry",
+  colSets: "Sety",
+  colPointsFor: "Míčky pro",
+  colPointsAgainst: "Míčky proti",
+  colDiff: "Rozdíl",
 };
 
 export default csCZ;

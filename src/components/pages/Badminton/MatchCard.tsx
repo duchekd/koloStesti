@@ -1,3 +1,5 @@
+import { FocusEvent } from "react";
+
 import {
   Box,
   Button,
@@ -19,6 +21,9 @@ import Icon from "@mdi/react";
 import { Match, WheelItem } from "../../../hooks/useWheelStore";
 
 import useTexts from "../../../languages";
+
+// po kliknutí do pole se hodnota označí, aby ji první napsaná číslice přepsala (jinak vznikne „021")
+const selectOnFocus = (event: FocusEvent<HTMLInputElement>) => event.currentTarget.select();
 
 type Props = {
   match: Match;
@@ -109,6 +114,7 @@ const MatchCard = ({ match, players, onSetPlayer, onAddSet, onUpdateSet, onRemov
                   type="number"
                   value={gameSet.a}
                   onChange={event => onUpdateSet(index, "a", Math.max(0, Number(event.target.value) || 0))}
+                  onFocus={selectOnFocus}
                   slotProps={{ htmlInput: { min: 0, style: { textAlign: "center" } } }}
                   sx={{ width: 72 }}
                   focused={aWins || undefined}
@@ -120,6 +126,7 @@ const MatchCard = ({ match, players, onSetPlayer, onAddSet, onUpdateSet, onRemov
                   type="number"
                   value={gameSet.b}
                   onChange={event => onUpdateSet(index, "b", Math.max(0, Number(event.target.value) || 0))}
+                  onFocus={selectOnFocus}
                   slotProps={{ htmlInput: { min: 0, style: { textAlign: "center" } } }}
                   sx={{ width: 72 }}
                   focused={bWins || undefined}

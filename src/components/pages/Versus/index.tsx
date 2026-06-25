@@ -19,8 +19,7 @@ type Props = {
 const VersusPage = ({ onOpenNav }: Props) => {
   const texts = useTexts();
 
-  const { active } = useWheelStore("versus");
-  const items = active?.items ?? [];
+  const { items } = useWheelStore("versus");
 
   const [rolling, setRolling] = useState(false);
   const [pair, setPair] = useState<[WheelItem, WheelItem] | null>(null);

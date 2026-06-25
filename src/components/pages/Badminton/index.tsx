@@ -17,10 +17,10 @@ type Props = {
 const BadmintonPage = ({ onOpenNav }: Props) => {
   const texts = useTexts();
 
-  const { active, addMatch, removeMatch, setMatchPlayer, addMatchSet, updateMatchSet, removeMatchSet } =
+  const { active, items, addMatch, removeMatch, setMatchPlayer, addMatchSet, updateMatchSet, removeMatchSet } =
     useWheelStore("badminton");
 
-  const players = active?.items ?? [];
+  const players = items;
   const matches = active?.matches ?? [];
   const setId = active?.id ?? null;
   const canPlay = players.length >= 2;

@@ -51,6 +51,14 @@ const enUS: Lang = {
   noMatches: "No matches yet – add one with the “New match” button",
   removeMatch: "Delete match",
   noSets: "No sets yet",
+  sectionStats: "Statistics",
+  statsEmpty: "No matches with results yet",
+  colPlayer: "Player",
+  colWins: "Wins",
+  colSets: "Sets",
+  colPointsFor: "Points for",
+  colPointsAgainst: "Points against",
+  colDiff: "Diff",
 };
 
 export default enUS;

@@ -1,7 +1,6 @@
 import { KeyboardEvent, ReactNode, useState } from "react";
 
 import {
-  AppBar,
   Box,
   Button,
   Chip,
@@ -10,7 +9,6 @@ import {
   Paper,
   Stack,
   TextField,
-  Toolbar,
   Typography,
   useMediaQuery,
   useTheme,
@@ -26,6 +24,7 @@ import useTexts from "../../languages";
 import LanguageToggle from "./LanguageToggle";
 import SetManager from "./SetManager";
 import ThemeToggle from "./ThemeToggle";
+import TopBar from "./TopBar";
 
 type Props = {
   /** Hra, jejíž sady se používají (každá hra má vlastní oddělené sady). */
@@ -51,8 +50,7 @@ const ToolLayout = ({ scope, setNameMode = "text", title, busy = false, onOpenNa
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const { active, addItem, removeItem, clearAll } = useWheelStore(scope);
-  const items = active?.items ?? [];
+  const { active, items, addItem, removeItem, clearAll } = useWheelStore(scope);
 
   const [draft, setDraft] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -134,24 +132,7 @@ const ToolLayout = ({ scope, setNameMode = "text", title, busy = false, onOpenNa
   if (isMobile) {
     return (
       <Box sx={{ display: "flex", flexDirection: "column", height: "100dvh", boxSizing: "border-box" }}>
-        {/* Horní lišta aplikace – levé menu, název sekce a přepínač motivu */}
-        <AppBar
-          position="static"
-          color="default"
-          elevation={0}
-          sx={{ bgcolor: "background.paper", borderBottom: "1px solid", borderColor: "divider" }}
-        >
-          <Toolbar sx={{ gap: 1 }}>
-            <IconButton edge="start" onClick={onOpenNav} aria-label={texts.menu}>
-              <Icon path={mdiMenu} size={1} />
-            </IconButton>
-            <Typography variant="h6" fontWeight={800} noWrap sx={{ flex: 1 }}>
-              {title}
-            </Typography>
-            <LanguageToggle />
-            <ThemeToggle />
-          </Toolbar>
-        </AppBar>
+        <TopBar title={title} onOpenNav={onOpenNav} />
 
         {/* Obsah sekce */}
         <Box

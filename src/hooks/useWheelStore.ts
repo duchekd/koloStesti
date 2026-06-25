@@ -34,7 +34,13 @@ export interface NameSet {
 interface ScopeState {
   sets: NameSet[];
   activeId: string | null;
+  // hry v SHARED_ITEM_SCOPES sdílí jména napříč všemi sadami (badminton: hráči přes všechna data)
+  sharedItems?: WheelItem[];
 }
+
+// Hry, kde jsou položky (jména) společné pro všechny sady místo zvlášť pro každou.
+const SHARED_ITEM_SCOPES = new Set<string>(["badminton"]);
+const isShared = (scope: string) => SHARED_ITEM_SCOPES.has(scope);
 
 interface SetStore {
   scopes: Record<string, ScopeState>;
@@ -75,7 +81,7 @@ const createSetObject = (name: string): NameSet => ({
 // nová hra dostane jednu prázdnou výchozí sadu
 const createScope = (): ScopeState => {
   const set = createSetObject(DEFAULT_SET_NAME);
-  return { sets: [set], activeId: set.id };
+  return { sets: [set], activeId: set.id, sharedItems: [] };
 };
 
 // upraví scope dané hry (pokud ještě neexistuje, založí ho)
@@ -88,16 +94,20 @@ const updateScope = (
   return { scopes: { ...state.scopes, [scope]: updater(current) } };
 };
 
-// upraví položky aktivní sady dané hry
+// upraví položky (jména) – u sdílených her společné pro celý scope, jinak jen aktivní sadu
 const updateActiveItems = (
   state: SetStore,
   scope: string,
   updater: (items: WheelItem[]) => WheelItem[]
 ): Partial<SetStore> =>
-  updateScope(state, scope, scopeState => ({
-    ...scopeState,
-    sets: scopeState.sets.map(set => (set.id === scopeState.activeId ? { ...set, items: updater(set.items) } : set)),
-  }));
+  isShared(scope)
+    ? updateScope(state, scope, scopeState => ({ ...scopeState, sharedItems: updater(scopeState.sharedItems ?? []) }))
+    : updateScope(state, scope, scopeState => ({
+        ...scopeState,
+        sets: scopeState.sets.map(set =>
+          set.id === scopeState.activeId ? { ...set, items: updater(set.items) } : set
+        ),
+      }));
 
 // upraví zápasy konkrétní sady (badminton)
 const updateMatches = (
@@ -120,6 +130,23 @@ const updateOneMatch = (
   updater: (match: Match) => Match
 ): Partial<SetStore> =>
   updateMatches(state, scope, setId, matches => matches.map(match => (match.id === matchId ? updater(match) : match)));
+
+// jména dané hry – sdílená pro celý scope, nebo z aktivní sady
+const itemsOf = (scopeState: ScopeState | undefined, scope: string): WheelItem[] => {
+  if (!scopeState) return [];
+  if (isShared(scope)) return scopeState.sharedItems ?? [];
+  return scopeState.sets.find(s => s.id === scopeState.activeId)?.items ?? [];
+};
+
+// dvě různá náhodná jména (id) z poolu – pro předvyplnění nového zápasu
+const pickTwoRandom = (pool: WheelItem[]): [string | null, string | null] => {
+  if (pool.length === 0) return [null, null];
+  if (pool.length === 1) return [pool[0].id, null];
+  const a = Math.floor(Math.random() * pool.length);
+  let b = Math.floor(Math.random() * (pool.length - 1));
+  if (b >= a) b += 1;
+  return [pool[a].id, pool[b].id];
+};
 
 const useSetStore = create<SetStore>()(
   persist(
@@ -180,9 +207,11 @@ const useSetStore = create<SetStore>()(
       clearAll: scope => set(state => updateActiveItems(state, scope, () => [])),
 
       addMatch: (scope, setId) =>
-        set(state =>
-          updateMatches(state, scope, setId, matches => [...matches, { id: createId(), aId: null, bId: null, sets: [] }])
-        ),
+        set(state => {
+          // nový zápas se rovnou předvyplní dvěma náhodnými hráči z položek
+          const [aId, bId] = pickTwoRandom(itemsOf(state.scopes[scope], scope));
+          return updateMatches(state, scope, setId, matches => [...matches, { id: createId(), aId, bId, sets: [] }]);
+        }),
 
       removeMatch: (scope, setId, matchId) =>
         set(state => updateMatches(state, scope, setId, matches => matches.filter(match => match.id !== matchId))),
@@ -243,13 +272,17 @@ const useSetStore = create<SetStore>()(
         if (!state.scopes.wheel) state.scopes.wheel = createScope();
         if (!state.scopes.versus) state.scopes.versus = createScope();
         if (!state.scopes.badminton) state.scopes.badminton = createScope();
-        Object.values(state.scopes).forEach(scopeState => {
+        Object.entries(state.scopes).forEach(([scope, scopeState]) => {
           if (scopeState.sets.length === 0) {
             const fresh = createScope();
             scopeState.sets = fresh.sets;
             scopeState.activeId = fresh.activeId;
           } else if (!scopeState.sets.some(s => s.id === scopeState.activeId)) {
             scopeState.activeId = scopeState.sets[0].id;
+          }
+          // u sdílených her zajistíme společný seznam jmen; případná dřívější jména ze sad přeneseme
+          if (isShared(scope) && (!scopeState.sharedItems || scopeState.sharedItems.length === 0)) {
+            scopeState.sharedItems = scopeState.sets.flatMap(s => s.items);
           }
         });
       },
@@ -284,11 +317,14 @@ const useWheelStore = (scope: string) => {
   const sets = scopeState?.sets ?? [];
   const activeId = scopeState?.activeId ?? null;
   const active = sets.find(s => s.id === activeId) ?? null;
+  // jména – buď sdílená pro celý scope (badminton), nebo z aktivní sady
+  const items = isShared(scope) ? scopeState?.sharedItems ?? [] : active?.items ?? [];
 
   return {
     sets,
     activeId,
     active,
+    items,
     createSet: (name: string) => createSet(scope, name),
     renameSet: (id: string, name: string) => renameSet(scope, id, name),
     deleteSet: (id: string) => deleteSet(scope, id),

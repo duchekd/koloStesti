@@ -19,8 +19,7 @@ type Props = {
 const WheelPage = ({ onOpenNav }: Props) => {
   const texts = useTexts();
 
-  const { active } = useWheelStore("wheel");
-  const items = active?.items ?? [];
+  const { items } = useWheelStore("wheel");
 
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState<WheelItem | null>(null);

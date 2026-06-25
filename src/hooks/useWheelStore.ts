@@ -65,6 +65,9 @@ interface SetStore {
   addMatchSet: (scope: string, setId: string, matchId: string) => void;
   updateMatchSet: (scope: string, setId: string, matchId: string, index: number, side: "a" | "b", value: number) => void;
   removeMatchSet: (scope: string, setId: string, matchId: string, index: number) => void;
+
+  // hromadná náhrada badminton dat z cloudu (sety + sdílení hráči); zachová lokální activeId
+  replaceBadmintonData: (sets: NameSet[], sharedItems: WheelItem[]) => void;
 }
 
 const createId = () =>
@@ -148,7 +151,7 @@ const pickTwoRandom = (pool: WheelItem[]): [string | null, string | null] => {
   return [pool[a].id, pool[b].id];
 };
 
-const useSetStore = create<SetStore>()(
+export const useSetStore = create<SetStore>()(
   persist(
     set => ({
       // výchozí stav – známé hry mají vlastní prázdnou sadu
@@ -244,6 +247,21 @@ const useSetStore = create<SetStore>()(
             sets: match.sets.filter((_, i) => i !== index),
           }))
         ),
+
+      replaceBadmintonData: (sets, sharedItems) =>
+        set(state => {
+          // prázdná data z cloudu nahradíme výchozí sadou, ať je vždy aspoň jedna
+          const safeSets = sets.length > 0 ? sets : createScope().sets;
+          const prevActiveId = state.scopes.badminton?.activeId;
+          // zachováme lokálně vybraný turnaj, pokud ve staženích datech pořád existuje
+          const activeId = safeSets.some(s => s.id === prevActiveId) ? prevActiveId! : safeSets[0].id;
+          return {
+            scopes: {
+              ...state.scopes,
+              badminton: { sets: safeSets, activeId, sharedItems },
+            },
+          };
+        }),
     }),
     {
       name: "randomizer-wheel-items",

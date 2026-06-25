@@ -59,6 +59,10 @@ const enUS: Lang = {
   colPointsFor: "Points for",
   colPointsAgainst: "Points against",
   colDiff: "Diff",
+  signIn: "Sign in",
+  signOut: "Sign out",
+  signedIn: "Signed in",
+  account: "Account",
 };
 
 export default enUS;

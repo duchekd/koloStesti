@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 
+import useBadmintonSync from "./hooks/useBadmintonSync";
 import useThemeMode from "./hooks/useThemeMode";
 
 import createCache from "@emotion/cache";
@@ -22,6 +23,9 @@ const App = () => {
 
   const [section, setSection] = useState<SectionId>("wheel");
   const [navOpen, setNavOpen] = useState(false);
+
+  // realtime synchronizace badmintonu s cloudem (no-op bez přihlášení / konfigurace)
+  useBadmintonSync();
 
   const openNav = () => setNavOpen(true);
 

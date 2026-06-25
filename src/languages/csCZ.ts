@@ -59,6 +59,10 @@ const csCZ = {
   colPointsFor: "Míčky pro",
   colPointsAgainst: "Míčky proti",
   colDiff: "Rozdíl",
+  signIn: "Přihlásit se",
+  signOut: "Odhlásit se",
+  signedIn: "Přihlášeno",
+  account: "Účet",
 };
 
 export default csCZ;

@@ -5,6 +5,7 @@ import Icon from "@mdi/react";
 
 import useTexts from "../../languages";
 
+import AuthButton from "./AuthButton";
 import LanguageToggle from "./LanguageToggle";
 import ThemeToggle from "./ThemeToggle";
 
@@ -33,6 +34,7 @@ const TopBar = ({ title, onOpenNav }: Props) => {
         </Typography>
         <LanguageToggle />
         <ThemeToggle />
+        <AuthButton />
       </Toolbar>
     </AppBar>
   );

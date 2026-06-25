@@ -21,6 +21,7 @@ import useWheelStore from "../../hooks/useWheelStore";
 
 import useTexts from "../../languages";
 
+import AuthButton from "./AuthButton";
 import LanguageToggle from "./LanguageToggle";
 import SetManager from "./SetManager";
 import ThemeToggle from "./ThemeToggle";
@@ -226,6 +227,7 @@ const ToolLayout = ({ scope, setNameMode = "text", title, busy = false, onOpenNa
           </Typography>
           <LanguageToggle />
           <ThemeToggle />
+          <AuthButton />
         </Stack>
 
         <SetManager scope={scope} nameMode={setNameMode} disabled={busy} />

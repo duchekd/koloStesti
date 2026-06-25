@@ -1,0 +1,6 @@
+build
+node_modules
+env
+public
+scripts
+src/types.generated.ts

@@ -1,0 +1,29 @@
+export type Lang = typeof csCZ;
+
+const csCZ = {
+  yes: "Ano",
+  no: "Ne",
+  wheelTitle: "Kolo štěstí",
+  addItemPlaceholder: "Nová položka",
+  add: "Přidat",
+  spin: "Roztočit",
+  clearAll: "Vymazat vše",
+  winner: "Výherce",
+  emptyWheel: "Přidejte položky a roztočte kolo",
+  noItems: "Zatím žádné položky",
+  close: "Zavřít",
+  set: "Sada",
+  newSet: "Nová sada",
+  setName: "Název sady",
+  rename: "Přejmenovat",
+  delete: "Smazat",
+  deleteSetConfirm: "Opravdu smazat sadu",
+  save: "Uložit",
+  cancel: "Zrušit",
+  items: "Položky",
+  itemSettings: "Nastavení položek",
+  darkMode: "Tmavý režim",
+  lightMode: "Světlý režim",
+};
+
+export default csCZ;

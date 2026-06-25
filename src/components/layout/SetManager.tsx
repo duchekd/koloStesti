@@ -19,11 +19,13 @@ import {
 import { mdiPencilOutline, mdiPlaylistPlus, mdiTrashCanOutline } from "@mdi/js";
 import Icon from "@mdi/react";
 
-import useWheelStore from "../../../hooks/useWheelStore";
+import useWheelStore from "../../hooks/useWheelStore";
 
-import useTexts from "../../../languages";
+import useTexts from "../../languages";
 
 type Props = {
+  /** Hra, jejíž sady se spravují (každá hra má vlastní oddělené sady). */
+  scope: string;
   disabled?: boolean;
 };
 
@@ -31,26 +33,24 @@ type NameDialog = { open: boolean; mode: "create" | "rename"; value: string };
 
 const closedDialog: NameDialog = { open: false, mode: "create", value: "" };
 
-const SetManager = ({ disabled = false }: Props) => {
+const SetManager = ({ scope, disabled = false }: Props) => {
   const texts = useTexts();
-  const { wheels, activeWheelId, createWheel, renameWheel, deleteWheel, selectWheel } = useWheelStore();
+  const { sets, activeId, active, createSet, renameSet, deleteSet, selectSet } = useWheelStore(scope);
 
   const [nameDialog, setNameDialog] = useState<NameDialog>(closedDialog);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const activeWheel = wheels.find(wheel => wheel.id === activeWheelId);
-
   const openCreate = () => setNameDialog({ open: true, mode: "create", value: "" });
-  const openRename = () => setNameDialog({ open: true, mode: "rename", value: activeWheel?.name ?? "" });
+  const openRename = () => setNameDialog({ open: true, mode: "rename", value: active?.name ?? "" });
   const closeNameDialog = () => setNameDialog(closedDialog);
 
   const handleNameSave = () => {
     const value = nameDialog.value.trim();
     if (value === "") return;
     if (nameDialog.mode === "create") {
-      createWheel(value);
-    } else if (activeWheelId) {
-      renameWheel(activeWheelId, value);
+      createSet(value);
+    } else if (activeId) {
+      renameSet(activeId, value);
     }
     closeNameDialog();
   };
@@ -63,7 +63,7 @@ const SetManager = ({ disabled = false }: Props) => {
   };
 
   const handleDelete = () => {
-    if (activeWheelId) deleteWheel(activeWheelId);
+    if (activeId) deleteSet(activeId);
     setDeleteOpen(false);
   };
 
@@ -75,12 +75,12 @@ const SetManager = ({ disabled = false }: Props) => {
           <Select
             labelId="set-select-label"
             label={texts.set}
-            value={activeWheelId ?? ""}
-            onChange={event => selectWheel(event.target.value)}
+            value={activeId ?? ""}
+            onChange={event => selectSet(event.target.value)}
           >
-            {wheels.map(wheel => (
-              <MenuItem key={wheel.id} value={wheel.id}>
-                {wheel.name}
+            {sets.map(set => (
+              <MenuItem key={set.id} value={set.id}>
+                {set.name}
               </MenuItem>
             ))}
           </Select>
@@ -95,14 +95,18 @@ const SetManager = ({ disabled = false }: Props) => {
         </Tooltip>
         <Tooltip title={texts.rename}>
           <span>
-            <IconButton onClick={openRename} disabled={disabled || !activeWheel}>
+            <IconButton onClick={openRename} disabled={disabled || !active}>
               <Icon path={mdiPencilOutline} size={1} />
             </IconButton>
           </span>
         </Tooltip>
         <Tooltip title={texts.delete}>
           <span>
-            <IconButton color="error" onClick={() => setDeleteOpen(true)} disabled={disabled || !activeWheel}>
+            <IconButton
+              color="error"
+              onClick={() => setDeleteOpen(true)}
+              disabled={disabled || !active || sets.length <= 1}
+            >
               <Icon path={mdiTrashCanOutline} size={1} />
             </IconButton>
           </span>
@@ -135,7 +139,7 @@ const SetManager = ({ disabled = false }: Props) => {
       <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>{texts.delete}</DialogTitle>
         <DialogContent>
-          {texts.deleteSetConfirm} „{activeWheel?.name}"?
+          {texts.deleteSetConfirm} „{active?.name}"?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteOpen(false)}>{texts.cancel}</Button>

@@ -24,6 +24,22 @@ const enUS: Lang = {
   itemSettings: "Item settings",
   darkMode: "Dark mode",
   lightMode: "Light mode",
+  appName: "Randomizer",
+  appTagline: "Random tools",
+  menu: "Menu",
+  comingSoon: "Coming soon",
+  sectionDice: "Dice roll",
+  sectionCards: "Card draw",
+  sectionNumber: "Random number",
+  sectionVersus: "Name battle",
+  editItems: "Edit items",
+  draw: "Draw",
+  drawAgain: "Draw again",
+  emptyVersus: "Add at least two names and draw a duel",
+  versus: "vs",
+  fight: "Fight!",
+  czech: "Czech",
+  english: "English",
 };
 
 export default enUS;

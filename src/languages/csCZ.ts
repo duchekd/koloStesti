@@ -24,6 +24,22 @@ const csCZ = {
   itemSettings: "Nastavení položek",
   darkMode: "Tmavý režim",
   lightMode: "Světlý režim",
+  appName: "Randomizer",
+  appTagline: "Náhodné nástroje",
+  menu: "Menu",
+  comingSoon: "Již brzy",
+  sectionDice: "Hod kostkou",
+  sectionCards: "Tažení karet",
+  sectionNumber: "Náhodné číslo",
+  sectionVersus: "Souboj jmen",
+  editItems: "Upravit položky",
+  draw: "Vylosovat",
+  drawAgain: "Vylosovat znovu",
+  emptyVersus: "Přidejte aspoň dvě jména a vylosujte souboj",
+  versus: "vs",
+  fight: "Souboj!",
+  czech: "Čeština",
+  english: "Angličtina",
 };
 
 export default csCZ;

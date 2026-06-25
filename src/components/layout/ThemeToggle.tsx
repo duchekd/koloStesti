@@ -3,9 +3,9 @@ import { IconButton, Tooltip } from "@mui/material";
 import { mdiWeatherNight, mdiWeatherSunny } from "@mdi/js";
 import Icon from "@mdi/react";
 
-import useThemeMode from "../../../hooks/useThemeMode";
+import useThemeMode from "../../hooks/useThemeMode";
 
-import useTexts from "../../../languages";
+import useTexts from "../../languages";
 
 const ThemeToggle = () => {
   const texts = useTexts();

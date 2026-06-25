@@ -13,6 +13,7 @@ const csCZ = {
   noItems: "Zatím žádné položky",
   close: "Zavřít",
   set: "Sada",
+  date: "Datum",
   newSet: "Nová sada",
   setName: "Název sady",
   rename: "Přejmenovat",
@@ -40,6 +41,16 @@ const csCZ = {
   fight: "Souboj!",
   czech: "Čeština",
   english: "Angličtina",
+  sectionBadminton: "Badminton",
+  newMatch: "Nový zápas",
+  match: "Zápas",
+  addSet: "Přidat set",
+  playerA: "Hráč A",
+  playerB: "Hráč B",
+  needTwoPlayers: "Přidej do sady aspoň dva hráče (přes úpravu položek)",
+  noMatches: "Zatím žádný zápas – přidej ho tlačítkem „Nový zápas\"",
+  removeMatch: "Smazat zápas",
+  noSets: "Zatím žádný set",
 };
 
 export default csCZ;

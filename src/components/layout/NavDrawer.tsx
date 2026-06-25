@@ -11,17 +11,17 @@ import {
   Typography,
 } from "@mui/material";
 
-import { mdiCardsOutline, mdiDiceMultiple, mdiFerrisWheel, mdiNumeric, mdiSwordCross } from "@mdi/js";
+import { mdiBadminton, mdiCardsOutline, mdiDiceMultiple, mdiFerrisWheel, mdiNumeric, mdiSwordCross } from "@mdi/js";
 import Icon from "@mdi/react";
 
 import useTexts from "../../languages";
 
-export type SectionId = "wheel" | "versus" | "dice" | "cards" | "number";
+export type SectionId = "wheel" | "versus" | "badminton" | "dice" | "cards" | "number";
 
 type NavSection = {
   id: SectionId;
   icon: string;
-  labelKey: "wheelTitle" | "sectionVersus" | "sectionDice" | "sectionCards" | "sectionNumber";
+  labelKey: "wheelTitle" | "sectionVersus" | "sectionBadminton" | "sectionDice" | "sectionCards" | "sectionNumber";
   available: boolean;
 };
 
@@ -29,6 +29,7 @@ type NavSection = {
 const sections: NavSection[] = [
   { id: "wheel", icon: mdiFerrisWheel, labelKey: "wheelTitle", available: true },
   { id: "versus", icon: mdiSwordCross, labelKey: "sectionVersus", available: true },
+  { id: "badminton", icon: mdiBadminton, labelKey: "sectionBadminton", available: true },
   { id: "dice", icon: mdiDiceMultiple, labelKey: "sectionDice", available: false },
   { id: "cards", icon: mdiCardsOutline, labelKey: "sectionCards", available: false },
   { id: "number", icon: mdiNumeric, labelKey: "sectionNumber", available: false },

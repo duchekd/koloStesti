@@ -13,6 +13,7 @@ const enUS: Lang = {
   noItems: "No items yet",
   close: "Close",
   set: "Set",
+  date: "Date",
   newSet: "New set",
   setName: "Set name",
   rename: "Rename",
@@ -40,6 +41,16 @@ const enUS: Lang = {
   fight: "Fight!",
   czech: "Czech",
   english: "English",
+  sectionBadminton: "Badminton",
+  newMatch: "New match",
+  match: "Match",
+  addSet: "Add set",
+  playerA: "Player A",
+  playerB: "Player B",
+  needTwoPlayers: "Add at least two players to the set (via item editing)",
+  noMatches: "No matches yet – add one with the “New match” button",
+  removeMatch: "Delete match",
+  noSets: "No sets yet",
 };
 
 export default enUS;

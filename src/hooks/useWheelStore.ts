@@ -8,10 +8,26 @@ export interface WheelItem {
   label: string;
 }
 
+// Jeden badmintonový set – skóre obou hráčů.
+export interface MatchSet {
+  a: number;
+  b: number;
+}
+
+// Zápas A vs B (hráči jsou odkazy na položky sady) a jeho sety.
+export interface Match {
+  id: string;
+  aId: string | null;
+  bId: string | null;
+  sets: MatchSet[];
+}
+
 export interface NameSet {
   id: string;
   name: string;
   items: WheelItem[];
+  // využívá jen badminton – zápasy v rámci této sady (turnaje)
+  matches?: Match[];
 }
 
 // Stav jedné hry (scope) – její sady a aktivní sada. Sady jednotlivých her jsou oddělené.
@@ -35,6 +51,14 @@ interface SetStore {
   addItem: (scope: string, label: string) => void;
   removeItem: (scope: string, itemId: string) => void;
   clearAll: (scope: string) => void;
+
+  // badminton – zápasy uvnitř konkrétní sady (turnaje)
+  addMatch: (scope: string, setId: string) => void;
+  removeMatch: (scope: string, setId: string, matchId: string) => void;
+  setMatchPlayer: (scope: string, setId: string, matchId: string, side: "a" | "b", itemId: string | null) => void;
+  addMatchSet: (scope: string, setId: string, matchId: string) => void;
+  updateMatchSet: (scope: string, setId: string, matchId: string, index: number, side: "a" | "b", value: number) => void;
+  removeMatchSet: (scope: string, setId: string, matchId: string, index: number) => void;
 }
 
 const createId = () =>
@@ -75,11 +99,33 @@ const updateActiveItems = (
     sets: scopeState.sets.map(set => (set.id === scopeState.activeId ? { ...set, items: updater(set.items) } : set)),
   }));
 
+// upraví zápasy konkrétní sady (badminton)
+const updateMatches = (
+  state: SetStore,
+  scope: string,
+  setId: string,
+  updater: (matches: Match[]) => Match[]
+): Partial<SetStore> =>
+  updateScope(state, scope, scopeState => ({
+    ...scopeState,
+    sets: scopeState.sets.map(set => (set.id === setId ? { ...set, matches: updater(set.matches ?? []) } : set)),
+  }));
+
+// upraví jeden konkrétní zápas
+const updateOneMatch = (
+  state: SetStore,
+  scope: string,
+  setId: string,
+  matchId: string,
+  updater: (match: Match) => Match
+): Partial<SetStore> =>
+  updateMatches(state, scope, setId, matches => matches.map(match => (match.id === matchId ? updater(match) : match)));
+
 const useSetStore = create<SetStore>()(
   persist(
     set => ({
       // výchozí stav – známé hry mají vlastní prázdnou sadu
-      scopes: { wheel: createScope(), versus: createScope() },
+      scopes: { wheel: createScope(), versus: createScope(), badminton: createScope() },
 
       ensureScope: scope =>
         set(state => (state.scopes[scope] ? {} : { scopes: { ...state.scopes, [scope]: createScope() } })),
@@ -132,6 +178,43 @@ const useSetStore = create<SetStore>()(
         set(state => updateActiveItems(state, scope, items => items.filter(item => item.id !== itemId))),
 
       clearAll: scope => set(state => updateActiveItems(state, scope, () => [])),
+
+      addMatch: (scope, setId) =>
+        set(state =>
+          updateMatches(state, scope, setId, matches => [...matches, { id: createId(), aId: null, bId: null, sets: [] }])
+        ),
+
+      removeMatch: (scope, setId, matchId) =>
+        set(state => updateMatches(state, scope, setId, matches => matches.filter(match => match.id !== matchId))),
+
+      setMatchPlayer: (scope, setId, matchId, side, itemId) =>
+        set(state =>
+          updateOneMatch(state, scope, setId, matchId, match => ({
+            ...match,
+            [side === "a" ? "aId" : "bId"]: itemId,
+          }))
+        ),
+
+      addMatchSet: (scope, setId, matchId) =>
+        set(state =>
+          updateOneMatch(state, scope, setId, matchId, match => ({ ...match, sets: [...match.sets, { a: 0, b: 0 }] }))
+        ),
+
+      updateMatchSet: (scope, setId, matchId, index, side, value) =>
+        set(state =>
+          updateOneMatch(state, scope, setId, matchId, match => ({
+            ...match,
+            sets: match.sets.map((s, i) => (i === index ? { ...s, [side]: value } : s)),
+          }))
+        ),
+
+      removeMatchSet: (scope, setId, matchId, index) =>
+        set(state =>
+          updateOneMatch(state, scope, setId, matchId, match => ({
+            ...match,
+            sets: match.sets.filter((_, i) => i !== index),
+          }))
+        ),
     }),
     {
       name: "randomizer-wheel-items",
@@ -159,6 +242,7 @@ const useSetStore = create<SetStore>()(
         if (!state.scopes) state.scopes = {};
         if (!state.scopes.wheel) state.scopes.wheel = createScope();
         if (!state.scopes.versus) state.scopes.versus = createScope();
+        if (!state.scopes.badminton) state.scopes.badminton = createScope();
         Object.values(state.scopes).forEach(scopeState => {
           if (scopeState.sets.length === 0) {
             const fresh = createScope();
@@ -185,6 +269,12 @@ const useWheelStore = (scope: string) => {
   const addItem = useSetStore(state => state.addItem);
   const removeItem = useSetStore(state => state.removeItem);
   const clearAll = useSetStore(state => state.clearAll);
+  const addMatch = useSetStore(state => state.addMatch);
+  const removeMatch = useSetStore(state => state.removeMatch);
+  const setMatchPlayer = useSetStore(state => state.setMatchPlayer);
+  const addMatchSet = useSetStore(state => state.addMatchSet);
+  const updateMatchSet = useSetStore(state => state.updateMatchSet);
+  const removeMatchSet = useSetStore(state => state.removeMatchSet);
 
   // pro hru, která ještě scope nemá (např. nově přidaná), ho doplníme
   useEffect(() => {
@@ -206,6 +296,16 @@ const useWheelStore = (scope: string) => {
     addItem: (label: string) => addItem(scope, label),
     removeItem: (itemId: string) => removeItem(scope, itemId),
     clearAll: () => clearAll(scope),
+
+    // badminton – zápasy v rámci sady (setId)
+    addMatch: (setId: string) => addMatch(scope, setId),
+    removeMatch: (setId: string, matchId: string) => removeMatch(scope, setId, matchId),
+    setMatchPlayer: (setId: string, matchId: string, side: "a" | "b", itemId: string | null) =>
+      setMatchPlayer(scope, setId, matchId, side, itemId),
+    addMatchSet: (setId: string, matchId: string) => addMatchSet(scope, setId, matchId),
+    updateMatchSet: (setId: string, matchId: string, index: number, side: "a" | "b", value: number) =>
+      updateMatchSet(scope, setId, matchId, index, side, value),
+    removeMatchSet: (setId: string, matchId: string, index: number) => removeMatchSet(scope, setId, matchId, index),
   };
 };
 

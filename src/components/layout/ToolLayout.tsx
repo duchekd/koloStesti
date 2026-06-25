@@ -30,6 +30,8 @@ import ThemeToggle from "./ThemeToggle";
 type Props = {
   /** Hra, jejíž sady se používají (každá hra má vlastní oddělené sady). */
   scope: string;
+  /** Jak se zadává název sady – textem, nebo datem (badminton). */
+  setNameMode?: "text" | "date";
   /** Název sekce zobrazený v horní liště. */
   title: string;
   /** Probíhá-li losování, ovládací prvky pro úpravu položek se zamknou. */
@@ -44,7 +46,7 @@ type Props = {
 
 // Sdílený rámec pro nástroje pracující se sadami jmen (kolo štěstí, souboj…).
 // Stará se o responzivní rozvržení, výběr sady a úpravu položek; nástroj dodá jen vizuál a hlavní akci.
-const ToolLayout = ({ scope, title, busy = false, onOpenNav, stage, action }: Props) => {
+const ToolLayout = ({ scope, setNameMode = "text", title, busy = false, onOpenNav, stage, action }: Props) => {
   const texts = useTexts();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -165,7 +167,7 @@ const ToolLayout = ({ scope, title, busy = false, onOpenNav, stage, action }: Pr
         >
           {/* Sjednocená lišta pro výběr a správu sady */}
           <Paper variant="outlined" sx={{ p: 1.5 }}>
-            <SetManager scope={scope} disabled={busy} />
+            <SetManager scope={scope} nameMode={setNameMode} disabled={busy} />
           </Paper>
 
           {/* Vizuál nástroje */}
@@ -245,7 +247,7 @@ const ToolLayout = ({ scope, title, busy = false, onOpenNav, stage, action }: Pr
           <ThemeToggle />
         </Stack>
 
-        <SetManager scope={scope} disabled={busy} />
+        <SetManager scope={scope} nameMode={setNameMode} disabled={busy} />
 
         {itemControls}
 
